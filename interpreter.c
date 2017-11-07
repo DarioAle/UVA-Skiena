@@ -61,68 +61,57 @@ int command0(int d, int s,int pc){
 }
 
 void printMatrix() {
-	int i = 0, j = 0;
-	for(i = 0; i < 1000 ; i++){
-		for(j = 0; j <= 2; j++)
+	for(int i = 0; i < 1000 ; i++){
+		for(int j = 0; j <= 2; j++)
 			putchar(ram[i][j]);
 		putchar('\n');
 	}
 }
 
 void cleanRemain (int pc) {
-	int k = 0, l = 0;
-	for(k = pc; k < 1000; k++) {
-		for(l = 0; l <= 2; l++ )
+	for(int k = pc; k < 1000; k++) {
+		for(int l = 0; l <= 2; l++ )
 			ram[k][l] = '0';
 	}
 }
 
 void printReg () {
-	int i = 0;
-	for(i = 0; i < 10; i++)
+	for(int i = 0; i < 10; i++)
 		printf("%d ",reg[i]);
 	putchar('\n');
 }
 
 void cleanReg() {
-	int i = 0;
-	for(i = 0; i < 10; i++)
+	for(int i = 0; i < 10; i++)
 		reg[i] = 0;
 }
 
 int main () {
 	int cases;
 	char aux = 0;
-	int i = 0;
 
 	scanf("%d\n",&cases);
 
 
 	while(cases--) {
-
 		int pc = 0;
 		aux = 0;
 		while(aux != '\n'){
-			   for(i = 0; i < 3; i++) {
+			   for(int i = 0; i < 3; i++) {
 				 aux = getchar();
 				 if(aux == '\n') break;
 				 ram[pc][i] = aux;
-
 			   }
 			if(aux != '\n'){
 				getchar();
 				pc++;
 			}
 		}
-
 		cleanRemain(pc);
 		cleanReg();
-
 		pc = 0;
-
-
+		counter = 0;
 		while(ram[pc][0] != '1') {
-
 			switch(ram[pc][0]){
 			   case '2' : command2(ram[pc][1] - '0', ram[pc][2] - '0'); break;
 			   case '3' : command3(ram[pc][1] - '0', ram[pc][2] - '0'); break;
@@ -134,16 +123,17 @@ int main () {
 			   case '9' : command9(ram[pc][1] - '0', ram[pc][2] - '0'); break;
 			   case '0' : pc = command0(ram[pc][1] - '0', ram[pc][2] - '0',pc); break;
 			   default: break;
-
-
 			}
+			//printReg();
 			pc++;
 		}
-
-		printf("%d\n\n",++counter);
-		counter = 0;
-
+//		printf("M\n");
+//		printMatrix();
+//		printf("R\n");
+//		printReg();
+		if(cases) printf("%d\n\n",++counter);
+		else printf("%d\n",++counter);
 	}
-
+	getchar();
 	return 0;
 }
