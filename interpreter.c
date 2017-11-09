@@ -1,9 +1,23 @@
 #include <stdio.h>
 
-int reg[10] = {0};
-char ram[1000][3] = {{0},{0}};
+int reg[10]   = {0};
+int ram[1000] = {0};
 
 int counter = 0;
+
+
+void printReg () {
+	printf("R\n");
+	int i = 0;
+	for(i = 0; i < 10; i++)
+		printf("%03d ",reg[i]);
+	putchar('\n');
+}
+
+void command1(int c){
+
+	counter++;
+}
 
 void command2(int d, int n){
 	reg[d] = n;
@@ -40,109 +54,114 @@ void command7(int d, int s){
 }
 
 void command8(int d, int a){
-	reg[d] = ((ram[reg[a]][2] - '0') *   1) +
-			 ((ram[reg[a]][1] - '0') *  10) +
-			 ((ram[reg[a]][0] - '0') * 100);
+	reg[d] = ram[reg[a]];
 	counter++;
 }
 
 void command9(int s, int a){
-	ram[reg[a]][0] = (reg[s] / 100) + '0';
-	ram[reg[a]][1] = ((reg[s] / 10) % 10) + '0';
-	ram[reg[a]][2] = (reg[s] % 10) + '0';
+	ram[reg[a]] = reg[s];
 	counter++;
 }
 
-int command0(int d, int s,int pc){
-	if(reg[s] != 0)
-		pc = reg[d] - 1;
+void command0(int d, int s,int* pc){
+	if(reg[s] != 0) {
+		*pc = reg[d] - 1;
+	}
+
 	counter++;
-	return pc;
 }
 
-void printMatrix() {
-	int i = 0, j = 0;
+void printMatrix(int n) {
+	int i = 0;
+	printf("M\n");
 	for(i = 0; i < 1000 ; i++){
-		for(j = 0; j <= 2; j++)
-			putchar(ram[i][j]);
+			printf("%03d",ram[i]);
+
 		putchar('\n');
 	}
-}
-
-void cleanRemain (int pc) {
-	int k = 0, l = 0;
-	for(k = pc; k < 1000; k++) {
-		for(l = 0; l <= 2; l++ )
-			ram[k][l] = '0';
-	}
-}
-
-void printReg () {
-	int i = 0;
-	for(i = 0; i < 10; i++)
-		printf("%d ",reg[i]);
 	putchar('\n');
 }
 
+void cleanRemain (int pc) {
+	int k = 0;
+	for(k = pc; k < 1000; k++) {
+			ram[k] = 0;
+	}
+}
+
+
 void cleanReg() {
 	int i = 0;
-	for(i = 0; i < 10; i++)
+	for( i = 0; i < 10; i++)
 		reg[i] = 0;
 }
 
-int main () {
-	int cases;
-	char aux = 0;
+int getLine(int* valor ) {
 	int i = 0;
+	int sum = 0, aux = 0;
+	int p = 100;
+	for(i = 0; aux != '\n'; p /= 10, i++) {
+		aux = getchar();
+		if(aux == '\n') break;
+		sum += (aux - '0') * p;
+	}
 
-	scanf("%d\n",&cases);
+	*valor = sum;
+	return i;
+}
 
+int main () {
+	int num,x,y;
+	num = x = y = 0;
+	int flag = 0;
+	int cases;
+	scanf("%d\n\n",&cases);
 
 	while(cases--) {
-
 		int pc = 0;
-		aux = 0;
-		while(aux != '\n'){
-			   for(i = 0; i < 3; i++) {
-				 aux = getchar();
-				 if(aux == '\n') break;
-				 ram[pc][i] = aux;
+		flag = 0;
 
-			   }
-			if(aux != '\n'){
-				getchar();
-				pc++;
-			}
+		if(cases) {
+			while(getLine(&ram[pc++]) > 0);
 		}
+		else {
+			while(scanf("%d\n",&ram[pc++]) != EOF);
+		}
+
+
+
 
 		cleanRemain(pc);
 		cleanReg();
 
-		pc = 0;
+
+		for(pc = 0; ; pc++) {
+
+			num = ram[pc] % 100;
+			x = num / 10;
+			y = num % 10;
 
 
-		while(ram[pc][0] != '1') {
-
-			switch(ram[pc][0]){
-			   case '2' : command2(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '3' : command3(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '4' : command4(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '5' : command5(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '6' : command6(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '7' : command7(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '8' : command8(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '9' : command9(ram[pc][1] - '0', ram[pc][2] - '0'); break;
-			   case '0' : pc = command0(ram[pc][1] - '0', ram[pc][2] - '0',pc); break;
+			switch(ram[pc] / 100){
+			   case 1 : command1(cases); flag = 1; break;
+			   case 2 : command2(x, y); break;
+			   case 3 : command3(x, y); break;
+			   case 4 : command4(x, y); break;
+			   case 5 : command5(x, y); break;
+			   case 6 : command6(x, y); break;
+			   case 7 : command7(x, y); break;
+			   case 8 : command8(x, y); break;
+			   case 9 : command9(x, y); break;
+			   case 0 : command0(x,y,&pc); break;
 			   default: break;
-
-
 			}
-			pc++;
+
+			if(flag) break;
 		}
 
-		printf("%d\n\n",++counter);
+		if(cases) printf("%d\n\n",counter);
+		else printf("%d\n",counter);
 		counter = 0;
-
 	}
 
 	return 0;
